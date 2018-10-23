@@ -10,7 +10,8 @@
 #include <assert.h>
 #include <future>
 
-constexpr int THREAD_NUM= 12;
+const int MIN_THREAD_NUM = 12;
+constexpr int THREAD_NUM = 2 * MIN_THREAD_NUM;
 
 using Task = std::function<void()>;
 

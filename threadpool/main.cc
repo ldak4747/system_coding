@@ -3,6 +3,7 @@
 #include <iostream>
 #include <chrono>
 #include <random>
+#include <memory>
 
 int add (int a, int b) {
     return a + b;
@@ -21,12 +22,12 @@ int division (int a, int b) {
 }
 
 int main () {
-    ThreadPool tp(get_nprocs() * 2);
+    std::unique_ptr<ThreadPool> tp(new ThreadPool(get_nprocs() * 2));
 
-    std::future<int> addres = tp.commit(add, 1, 2);
-    std::future<int> minosres = tp.commit(minos, 1, 2);
-    std::future<int> multipleres = tp.commit(multiple, 1, 2);
-    std::future<int> divisionres = tp.commit(division, 1, 2);
+    std::future<int> addres = tp->commit(add, 1, 2);
+    std::future<int> minosres = tp->commit(minos, 1, 2);
+    std::future<int> multipleres = tp->commit(multiple, 1, 2);
+    std::future<int> divisionres = tp->commit(division, 1, 2);
 
     std::cout << addres.get() << std::endl;
     std::cout << minosres.get() << std::endl;
