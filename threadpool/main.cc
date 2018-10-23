@@ -13,7 +13,7 @@ std::string minos (int a, int b) {
     return std::to_string(a - b);
 }
 
-int multiple (int a, int b) {
+auto multiple (int a, int b) {
     return a * b;
 }
 
@@ -32,12 +32,12 @@ int main () {
     int a = 1, b = 2;
     std::future<std::string> divisionres = tp->commit(division, std::ref(a), std::ref(b));
 
-    std::cout << addres.get() << std::endl;
-    std::cout << minosres.get() << std::endl;
-    std::cout << multipleres.get() << std::endl;
-    std::cout << divisionres.get() << std::endl;
+    std::cout << addres.get() << std::endl;         //3
+    std::cout << minosres.get() << std::endl;       //"-1"
+    std::cout << multipleres.get() << std::endl;    //2
+    std::cout << divisionres.get() << std::endl;    //"0"
 
-    std::cout << a << std::endl;
-    std::cout << b << std::endl;
+    std::cout << a << std::endl;                    //10
+    std::cout << b << std::endl;                    //100
     return 0;
 }
