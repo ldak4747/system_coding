@@ -1,0 +1,33 @@
+1、为什么要hook系统调用
+    很简单, 实现自己所需要的功能, 如:
+    a. 常说的"统计malloc/free次数"
+    b. 如libco, 实现自己的异步网络
+
+2. 如何hook掉Linux的系统调用
+    这里以connect的系统调用为例(之所以用connect, 是因为malloc发生一个问题).
+
+    总体看有2种方法, 一种是强行指定优先使用的动态库的方式(LD_PRELOAD = xxx.so), 一种是通过控制链接顺序, 结合RTLD_NEXT方式指定自己所需的系统调用.
+
+    先说第二种(libco的方式),
+
+    Linux, elf在链接后, 是可以有多个同名的符号, 默认的, 哪个先被链接就调用哪个, 这是可以通过程序证明的:
+    打开本目录下的Makefile, 查看"TEST_LIB", 有一个被注释掉的"TEST_LIB", 它和上面没有被注释的TEST_LIB的区别是, 一个先链接dynamiclink一个后链接pthread, 被注释的先链接pthread后链接dynamiclink;
+    如果使用被注释的TEST_LIB, 会发现hook失败.
+    原因是, 先链接libpthread.so, 里边有connect符号, 再链接libdynamiclink.so, 这里边有hook过的系统调用connect, 因为链接libpthread.so在前, 使用默认调用的是libpthread.so中的connect. 而libdynamiclink.so将不会被调用.
+    如果使用没有被注释的TEST_LIB, 会发现hook成功.因为首先链接的是libdynamiclink.so.
+    那么如何实现在自己的connect中, 还能调用系统的connect呢, 就是通过dlsym(RTLD_NEXT, "connect")的方式, 找到了"elf中的下一个该符号", 即pthread中的connect.
+
+    观察dynamiclink.cc, 使用函数指针变量g_sys_connect_func, 指向libpthread.so中的connect的地址.
+
+    dlsym(RTLD_NEXT)是什么呢?
+    elf的同名符号, 就像链表一样, 可以通过dlsym(RTLD_NEXT)得到下一个同名符号的地址, 直到为nullptr.
+    所以可以通过dlsym(RTLD_NEXT)获取下一个链接的同名符号的地址.
+    
+    再说第二种,
+
+    同样还是编译好自己hook的libdynamiclink.so; LD_PRELOAD是Linux一个系统环境变量, 指定了应用程序在执行时, 默认访问哪个动态库的符号(在有多个同名符号时).
+    如 LD_PRELOAD=libdynamiclink.so ./main 127.0.0.1 8080
+    这时main在遇到connect时, 首先调用的是libdynamiclink.so的connect. 
+    相当于劫持了系统调用的connect.
+
+最后说一下, malloc的hook, 发现应用程序在"return 0"时, 也会默认调用, 而且同时hook的free却没有发现被调用, valgrind、gdb都不看见是怎么被调用的线索, 所以用connect举例.
