@@ -43,7 +43,7 @@ template<class T> std::shared_ptr<T> Singleton<T>::instance;
  *  2、可以传入任意参数创建实例
  *
  *  实现的思路 : 
- *  1、资源类构造函数设置为private, 防止在栈上创建实例; 同时将SingletonArgs<ResourceArgs>设为友       元类; 使单例模板类可以创建资源类的实例; 这就解决了问题1
+ *  1、资源类构造函数设置为private, 防止在栈上创建实例; 同时将SingletonArgs<ResourceArgs>设为友元类; 使单例模板类可以创建资源类的实例; 这就解决了问题1
  *  2、单例模板类的getInstance方法, 做成可变参数模板函数, 实现任意参数创建实例
  * */
 template<class T> class SingletonArgs {
