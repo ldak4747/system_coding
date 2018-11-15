@@ -1,0 +1,46 @@
+#pragma
+#include <memory>
+#include <mutex>
+
+template<class T> class Singleton {
+    static std::shared_ptr<T> instance;
+
+public:
+    Singleton() = default;
+    ~Singleton() = default;
+    Singleton(const Singleton &other) = delete;
+    Singleton &operator= (const Singleton &other) = delete;
+
+    static std::shared_ptr<T> &getInstance() {
+        static std::once_flag flag;
+        std::call_once(flag, [&]() {
+            instance.reset(new T());
+        });
+
+        return instance;
+    }
+};
+
+template<class T> std::shared_ptr<T> Singleton<T>::instance;
+
+template<class T> class SingletonArgs {
+    friend T;
+    static std::shared_ptr<T> instance;
+
+    SingletonArgs() = default;
+    ~SingletonArgs() = default;
+    SingletonArgs(const SingletonArgs &other) = delete;
+    SingletonArgs &operator= (const SingletonArgs &other) = delete;
+    
+public:
+    template<class ...Args> static std::shared_ptr<T> &getInstance (Args &&... args) {
+        static std::once_flag flag;
+        std::call_once(flag, [&]() {
+            instance.reset(new T(std::forward<Args>(args)...));
+        });
+
+        return instance;
+    }
+};
+
+template<class T> std::shared_ptr<T> SingletonArgs<T>::instance;
