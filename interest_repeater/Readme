@@ -1,0 +1,11 @@
+一个非常有意思的东西, 可以实现一个非常简单的服务的方式, 旨在加深理解网络IO
+1. 创建一个作为服务端的socket(server), 随机绑定本机某个端口, bind+listen开始监听
+2. 创建一个作为客户端的socket(client), 通过getsockname获取server的地址, connect
+3. 连接成功后, server做accept, 这样client就和accept的套接字, 创建了全双工TCP连接
+   server使命结束, 关闭.
+   这是这个小程序的要点, 旨在理解connect的是server, 但创建的连接不是
+4. 保存client和accept的socket, 返回这两个socket
+5. fork一个子进程, 父进程向其中一个socket写入, 子进程会由另外一个socket获取到, 子进程再写入, 父进程也会收到.
+
+这个近似echo的服务本身不值一提, 但这个创建一对互相通信的socket的方式非常有用.
+
