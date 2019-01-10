@@ -1,0 +1,1 @@
+/data1/liudong8/study/gcc7.3/bin/g++ -g main.cc -I /data1/liudong8/study/logprocess/data-access/thirdparty/include -L /data1/liudong8/study/logprocess/data-access/thirdparty/lib -lpthread -lglog -o main
