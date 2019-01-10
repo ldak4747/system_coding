@@ -18,7 +18,7 @@ time_t getTime () {
 }
 
 time_t getExpireTime () {
-    return getTime() + 5;
+    return getTime() + 3;
 }
 
 std::string parse (char *buf) {
@@ -53,10 +53,6 @@ void impl (int rds, int i, time_t expireTime) {
     memset(buf, 1024, 0);
     recv(rds, buf, 1024, 0);
     //LOG(INFO) << "index " << i << " work " << sleepTime << " ms, exec positiveDel.";
-    //mock the data process
-    std::random_device rd;
-    int sleepTime = rd() % 10;
-    std::this_thread::sleep_for(std::chrono::milliseconds(sleepTime));
 }
 
 void deleteLock (int rds, int i, time_t expireTime) {
@@ -69,6 +65,10 @@ void deleteLock (int rds, int i, time_t expireTime) {
     recv(rds, buf, 1024, 0);
     //LOG(INFO) << "index " << i << " positiveDel Lock. " << buf;
     
+    //mock the data process
+    std::random_device rd;
+    int sleepTime = rd() % 10;
+    std::this_thread::sleep_for(std::chrono::milliseconds(sleepTime));
 }
 
 int main () {
